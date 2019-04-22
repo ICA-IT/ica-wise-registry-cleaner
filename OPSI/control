@@ -1,0 +1,29 @@
+[Package]
+version: 1
+depends: 
+
+[Product]
+type: localboot
+id: ica-wise-registry-cleaner
+name: Wise Registry Cleaner
+description: Wise Registry Cleaner 9.5.3
+advice: 
+version: 9.5.3
+priority: 0
+licenseRequired: False
+productClasses: 
+setupScript: setup.opsiscript
+uninstallScript: uninstall.opsiscript
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[Changelog]
+ica-wise-registry-cleaner (9.5.3-1) stable; urgency=low
+
+	* initial: created by opsi-setup-detector
+
+ -- opsisetupdetector.exe <info@uib.de>  3/6/2018 9:44:54
+

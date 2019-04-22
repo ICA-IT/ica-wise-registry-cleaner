@@ -1,0 +1,121 @@
+; ----------------------------------------------------------------
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/en/credits/
+; ----------------------------------------------------------------
+
+;****************************************
+; SETUPTYPE      inno
+;****************************************
+; PRODUCTID      ica-wise-registry-cleaner
+; SETUPFILE      WRCFree.exe
+;****************************************
+; LICENSE        false     
+; PRODUCTDESC    Wise Registry Cleaner 9.5.3
+
+; PRODUCTNAME    Wise Registry Cleaner
+; PRODUCTSIZE    16 MB
+; PRODUCTVER     9.5.3
+;****************************************
+; SETUPSCRIPT    setup.opsiscript
+; UNINSSCRIPT    uninstall.opsiscript
+;****************************************
+; MSIID          
+; USE-MST        
+; INSTALLDIR     %ProgramFiles32Dir%\Wise\Wise Registry Cleaner
+;****************************************
+; TIMESTAMP      3/6/2018 9:44:54
+;****************************************
+
+[Actions]
+requiredWinstVersion >= "4.11.4.3"
+ScriptErrorMessages = false
+
+DefVar $SetupType$
+DefVar $ProductId$ 
+DefVar $Setupfile$ 
+DefVar $InstallDir$
+DefVar $MinimumSpace$
+DefVar $ExitCode$
+DefVar $ErrorMsg$
+DefVar $LicenseRequired$
+DefVar $LicenseKey$
+DefVar $LicensePool$
+DefVar $MsiId$
+DefVar $NsisInstallBatch$
+DefVar $LogDir$
+DefVar $ProductName2$
+
+Set $LogDir$ = "%opsiLogDir%"
+
+include_append "%ScriptPath%\check_inno_exitcode.opsiscript"
+
+; ----------------------------------------------------------------
+Set $SetupType$       = "inno"
+; ----------------------------------------------------------------
+
+; $ProductId$ is the name of the product in opsi, only lower letters, no umlauts, no white spaces, use '-' as a seperator
+Set $ProductId$       = "ica-wise-registry-cleaner"
+; $ProductName2$ is the name of the desktop icon
+Set $ProductName2$       = "Wise Registry Cleaner"
+Set $Setupfile$       = "WRCFree.exe"
+; the path where we find the product after the installation
+Set $InstallDir$      = "%ProgramFiles32Dir%\Wise\Wise Registry Cleaner"
+Set $LicenseRequired$ = "false"
+Set $LicensePool$     = "p_" + $ProductId$
+Set $MsiId$           = ""
+Set $MinimumSpace$    = "16 MB"
+; ----------------------------------------------------------------
+; ----------------------------------------------------------------
+
+if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
+   LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
+   isFatalError "No Space"
+   ; Stop process and set installation status to failed
+else
+   comment "Show product picture"
+   ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductId$
+
+   if FileExists("%ScriptPath%\delsub.opsiscript")
+      comment "Start uninstall sub section"
+      Sub "%ScriptPath%\delsub.opsiscript"
+   endif
+   
+   Message "Installing " + $ProductId$ + " ..."
+   
+   comment "Start setup program"
+   ChangeDirectory "%SCRIPTPATH%"
+   ;----------------------------------------------
+   Winbatch_install_inno
+   ;----------------------------------------------
+   Sub_check_exitcode	
+   ; delete the desktop icon
+   LinkFolder_uninstall_nuke
+endif
+
+
+; ----------------------------------------------------------------
+; install section
+; ----------------------------------------------------------------
+
+[Winbatch_install_inno]
+; http://unattended.sourceforge.net/InnoSetup_Switches_ExitCodes.html
+; You may create setup answer file by: setup.exe /SAVEINF="filename"
+; You may use an answer file by the parameter /LOADINF="filename"
+"%ScriptPath%\WRCFree.exe" /sp- /verysilent /norestart /nocancel /SUPPRESSMSGBOXES /LOG=c:\opsi.org\log\ica-wise-reg-install.log
+
+; ----------------------------------------------------------------
+
+[LinkFolder_uninstall_nuke]
+;
+; delete shortcut from AllUsers desktop:
+;
+ set_basefolder common_desktopdirectory
+ set_subfolder ""
+ delete_element $ProductName2$
+
+
+; ----------------------------------------------------------------
+; ----------------------------------------------------------------
+
